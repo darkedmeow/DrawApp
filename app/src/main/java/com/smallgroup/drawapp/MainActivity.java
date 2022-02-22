@@ -68,6 +68,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 else if (materialIntroViewId == "ID2") {
                     startIntro("ID3", "Кисть", drawBtn);
                 }
+                else if (materialIntroViewId == "ID3") {
+                    startIntro("ID4", "Что-то еще", drawBtn);
+                }
             }
         };
 
