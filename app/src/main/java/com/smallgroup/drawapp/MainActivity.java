@@ -63,13 +63,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onUserClicked(String materialIntroViewId) {
                 if (materialIntroViewId == "ID") {
-                    startIntro("ID2", "Рабочая область", drawView);
+                    startIntro("ID2", "Ластик", eraseBtn);
                 }
                 else if (materialIntroViewId == "ID2") {
-                    startIntro("ID2", "Кисть", drawBtn);
+                    startIntro("ID3", "Кисть", drawBtn);
                 }
             }
         };
+
+        startIntro("ID", "Рабочая область", drawView);
 
     }
 
