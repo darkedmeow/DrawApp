@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import java.util.UUID;
 
+import co.mobiwise.materialintro.MaterialIntroConfiguration;
+import co.mobiwise.materialintro.animation.MaterialIntroListener;
 import co.mobiwise.materialintro.shape.Focus;
 import co.mobiwise.materialintro.shape.FocusGravity;
 import co.mobiwise.materialintro.shape.ShapeType;
@@ -26,6 +28,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView drawBtn, eraseBtn, newBtn, saveBtn;
 
     private float smallBrush, mediumBrush, largeBrush;
+
+    private MaterialIntroConfiguration config;
+    private MaterialIntroListener materialIntroListener;
+
 
 
     @Override
@@ -51,26 +57,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mediumBrush = getResources().getInteger(R.integer.medium_size);
         largeBrush = getResources().getInteger(R.integer.large_size);
 
-        startIntro();
+        configurationMaterialIntro();
+
+        materialIntroListener = new MaterialIntroListener() {
+            @Override
+            public void onUserClicked(String materialIntroViewId) {
+                if (materialIntroViewId == "ID") {
+                    startIntro("ID2", "Рабочая область", drawView);
+                }
+                else if (materialIntroViewId == "ID2") {
+                    startIntro("ID2", "Кисть", drawBtn);
+                }
+            }
+        };
 
     }
 
+    private void configurationMaterialIntro() {
+        config = new MaterialIntroConfiguration();
+        config.setDotViewEnabled(true);
+        config.setFocusGravity(FocusGravity.CENTER);
+        config.setFocusType(Focus.MINIMUM);
+        config.setDelayMillis(500);
+        config.setFadeAnimationEnabled(true);
+    }
 
-    public void startIntro() {
+
+    public void startIntro(String id, String text, View view) {
         new MaterialIntroView.Builder(this)
-                .enableDotAnimation(true)
+                .setConfiguration(config)
                 .enableIcon(false)
-                .setFocusGravity(FocusGravity.CENTER)
-                .setFocusType(Focus.MINIMUM)
-                .setDelayMillis(500)
-                .enableFadeAnimation(true)
                 .performClick(true)
-                .setInfoText("Hi There! Click this card and see what happens.")
+                .setInfoText(text)
                 .setShape(ShapeType.CIRCLE)
-                .setTarget(drawView)
-                .setUsageId("intro_card") //THIS SHOULD BE UNIQUE ID
+                .setTarget(view)
+                .setUsageId(id)
+                .setListener(materialIntroListener)
                 .show();
     }
+
 
     public void paintClicked(View view) {
         if (view != currPaint){
