@@ -2,7 +2,6 @@ package com.smallgroup.drawapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -14,6 +13,11 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.UUID;
+
+import co.mobiwise.materialintro.shape.Focus;
+import co.mobiwise.materialintro.shape.FocusGravity;
+import co.mobiwise.materialintro.shape.ShapeType;
+import co.mobiwise.materialintro.view.MaterialIntroView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -30,23 +34,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         drawView = (DrawingView)findViewById(R.id.drawing);
 
-        LinearLayout paintLayout = (LinearLayout)findViewById(R.id.paint_colors);
-        currPaint = (ImageButton)paintLayout.getChildAt(0);
+        LinearLayout paintLayout = findViewById(R.id.paint_colors);
+        currPaint = (ImageButton) paintLayout.getChildAt(0);
         currPaint.setImageDrawable(getDrawable(R.drawable.paint_pressed));
 
-        drawBtn = (ImageView) findViewById(R.id.brush_btn);
+        drawBtn = findViewById(R.id.brush_btn);
         drawBtn.setOnClickListener(this);
-        eraseBtn = (ImageView) findViewById(R.id.erase_btn);
+        eraseBtn = findViewById(R.id.erase_btn);
         eraseBtn.setOnClickListener(this);
-        newBtn = (ImageView) findViewById(R.id.new_btn);
+        newBtn = findViewById(R.id.new_btn);
         newBtn.setOnClickListener(this);
-        saveBtn = (ImageView) findViewById(R.id.save_btn);
+        saveBtn = findViewById(R.id.save_btn);
         saveBtn.setOnClickListener(this);
 
         smallBrush = getResources().getInteger(R.integer.small_size);
         mediumBrush = getResources().getInteger(R.integer.medium_size);
         largeBrush = getResources().getInteger(R.integer.large_size);
 
+        startIntro();
+
+    }
+
+
+    public void startIntro() {
+        new MaterialIntroView.Builder(this)
+                .enableDotAnimation(true)
+                .enableIcon(false)
+                .setFocusGravity(FocusGravity.CENTER)
+                .setFocusType(Focus.MINIMUM)
+                .setDelayMillis(500)
+                .enableFadeAnimation(true)
+                .performClick(true)
+                .setInfoText("Hi There! Click this card and see what happens.")
+                .setShape(ShapeType.CIRCLE)
+                .setTarget(drawView)
+                .setUsageId("intro_card") //THIS SHOULD BE UNIQUE ID
+                .show();
     }
 
     public void paintClicked(View view) {
