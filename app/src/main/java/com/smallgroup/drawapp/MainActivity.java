@@ -62,14 +62,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         materialIntroListener = new MaterialIntroListener() {
             @Override
             public void onUserClicked(String materialIntroViewId) {
-                if (materialIntroViewId == "ID") {
-                    startIntro("ID2", "Ластик", eraseBtn);
-                }
-                else if (materialIntroViewId == "ID2") {
-                    startIntro("ID3", "Кисть", drawBtn);
-                }
-                else if (materialIntroViewId == "ID3") {
-                    startIntro("ID4", "Что-то еще", drawBtn);
+                switch (materialIntroViewId) {
+                    case "ID":
+                        startIntro("ID2", "Палитра", paintLayout);
+                        break;
+                    case "ID2":
+                        startIntro("ID3", "Кисть", drawBtn);
+                        break;
+                    case "ID3":
+                        startIntro("ID4", "Ластик", eraseBtn);
+                        break;
+                    case "ID4":
+                        startIntro("ID5", "Очистить экран", newBtn);
+                        break;
+                    case "ID5":
+                        startIntro("ID6", "Сохранить рисунок", saveBtn);
+                        break;
                 }
             }
         };
@@ -92,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         new MaterialIntroView.Builder(this)
                 .setConfiguration(config)
                 .enableIcon(false)
-                .performClick(true)
+                .performClick(false)
                 .setInfoText(text)
                 .setShape(ShapeType.CIRCLE)
                 .setTarget(view)
