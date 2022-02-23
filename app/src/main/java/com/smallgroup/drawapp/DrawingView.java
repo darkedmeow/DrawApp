@@ -9,6 +9,8 @@ import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -22,11 +24,25 @@ public class DrawingView extends View {
     private Canvas drawCanvas;
     private Bitmap canvasBitmap;
 
+    private GestureDetector gestureDetector;
+
     private boolean erase=false;
 
     public DrawingView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         setupDrawing();
+        setupGestureDetector();
+    }
+
+    private void setupGestureDetector() {
+        GestureDetector.SimpleOnGestureListener listener = new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                Log.d("GESTURE", "Double tap");
+                return super.onDoubleTap(e);
+            }
+        };
+        gestureDetector = new GestureDetector(getContext(), listener);
     }
 
     private void setupDrawing() {
@@ -61,6 +77,7 @@ public class DrawingView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         float touchX = event.getX();
         float touchY = event.getY();
+        gestureDetector.onTouchEvent(event);
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:

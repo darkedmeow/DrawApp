@@ -86,6 +86,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    public void showMsg(String txt) {
+        Toast.makeText(this, txt, Toast.LENGTH_LONG).show();
+    }
+
     private void configurationMaterialIntro() {
         config = new MaterialIntroConfiguration();
         config.setDotViewEnabled(true);
