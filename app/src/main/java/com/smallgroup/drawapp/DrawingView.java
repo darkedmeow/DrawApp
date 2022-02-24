@@ -16,8 +16,11 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
+
 public class DrawingView extends View {
 
+    private ArrayList<AdvancedPath> paths;
     private Path drawPath;
     private Paint drawPaint, canvasPaint;
     private int paintColor = 0xFF660000;
@@ -30,6 +33,7 @@ public class DrawingView extends View {
 
     public DrawingView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        paths = new ArrayList<>();
         setupDrawing();
         setupGestureDetector();
     }
@@ -38,6 +42,9 @@ public class DrawingView extends View {
         GestureDetector.SimpleOnGestureListener listener = new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
+                //TODO("отмена действия")
+                removeLastPath();
+                removeLastPath();
                 Log.d("GESTURE", "Double tap");
                 return super.onDoubleTap(e);
             }
@@ -70,6 +77,7 @@ public class DrawingView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
+        paths.forEach(path -> drawCanvas.drawPath(path.getPath(), path.getPaint()));
         canvas.drawPath(drawPath, drawPaint);
     }
 
@@ -77,7 +85,10 @@ public class DrawingView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         float touchX = event.getX();
         float touchY = event.getY();
-        gestureDetector.onTouchEvent(event);
+
+        if(gestureDetector.onTouchEvent(event)) {
+            return true;
+        }
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -87,7 +98,9 @@ public class DrawingView extends View {
                 drawPath.lineTo(touchX, touchY);
                 break;
             case MotionEvent.ACTION_UP:
-                drawCanvas.drawPath(drawPath, drawPaint);
+                paths.add(new AdvancedPath(
+                        new Path(drawPath), new Paint(drawPaint))
+                );
                 drawPath.reset();
                 break;
             default:
@@ -95,7 +108,6 @@ public class DrawingView extends View {
         }
         invalidate();
         return true;
-        //return super.onTouchEvent(event);
     }
 
     public void setColor(String color){
@@ -120,5 +132,14 @@ public class DrawingView extends View {
     public void startNew(){
         drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         invalidate();
+    }
+
+    public void removeLastPath() {
+        if (paths.size() > 0) {
+            paths.remove(paths.size() - 1);
+            drawCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            Log.d("REMOVE", "remove last path"+ paths.size());
+            invalidate();
+        }
     }
 }

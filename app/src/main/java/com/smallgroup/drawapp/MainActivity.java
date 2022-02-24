@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         materialIntroListener = new MaterialIntroListener() {
             @Override
             public void onUserClicked(String materialIntroViewId) {
+                //TODO("избавиться от хардокада")
                 switch (materialIntroViewId) {
                     case "ID":
                         startIntro("ID2", "Палитра", paintLayout);
