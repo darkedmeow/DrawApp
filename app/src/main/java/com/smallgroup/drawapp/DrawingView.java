@@ -116,6 +116,12 @@ public class DrawingView extends View {
         drawPaint.setColor(paintColor);
     }
 
+    public void setColor(int color) {
+        invalidate();
+        paintColor = color;
+        drawPaint.setColor(paintColor);
+    }
+
     public void setStrokeWidth(float size){
         invalidate();
         drawPaint.setStrokeWidth(size);

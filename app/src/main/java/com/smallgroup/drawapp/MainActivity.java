@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.azeesoft.lib.colorpicker.ColorPickerDialog;
+
 import java.util.UUID;
 
 import co.mobiwise.materialintro.MaterialIntroConfiguration;
@@ -127,13 +129,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public void chooseColor() {
+        ColorPickerDialog colorPickerDialog= ColorPickerDialog.createColorPickerDialog(this);
+        colorPickerDialog.setOnColorPickedListener(new ColorPickerDialog.OnColorPickedListener() {
+            @Override
+            public void onColorPicked(int color, String hexVal) {
+                drawView.setColor(color);
+                currPaint.setTag(hexVal);
+                currPaint.setBackgroundColor(color);
+            }
+        });
+        colorPickerDialog.show();
+    }
+
     @Override
     public void onClick(View view) {
         if (view.getId()==R.id.brush_btn) {
             drawView.setErase(false);
         }
         else if(view.getId()==R.id.erase_btn) {
-            drawView.setErase(true);
+//            drawView.setErase(true);
+            chooseColor();
         }
         else if(view.getId()==R.id.new_btn) {
             AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
