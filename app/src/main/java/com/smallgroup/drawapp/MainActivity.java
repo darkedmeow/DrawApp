@@ -3,7 +3,6 @@ package com.smallgroup.drawapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
@@ -27,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private DrawingView drawView;
     private ImageButton currPaint;
-    private ImageView drawBtn, eraseBtn, newBtn, saveBtn;
+    private ImageView drawBtn, eraseBtn, newBtn, saveBtn, palitra, undo;
 
     private float smallBrush, mediumBrush, largeBrush;
 
@@ -45,7 +44,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LinearLayout paintLayout = findViewById(R.id.paint_colors);
         currPaint = (ImageButton) paintLayout.getChildAt(0);
         currPaint.setImageDrawable(getDrawable(R.drawable.paint_pressed));
+        palitra = findViewById(R.id.palitra);
 
+        undo = findViewById(R.id.undo);
         drawBtn = findViewById(R.id.brush_btn);
         drawBtn.setOnClickListener(this);
         eraseBtn = findViewById(R.id.erase_btn);
@@ -67,25 +68,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //TODO("избавиться от хардокада")
                 switch (materialIntroViewId) {
                     case "ID":
-                        startIntro("ID2", "Палитра", paintLayout);
+                        showIntro("PALITRA", "В палитре есть базовые цвета", paintLayout);
+                        break;
+                    case "PALITRA":
+                        showIntro("ID2", "И еще тут есть много разных вариантов. Они сохраняются на время создания твоего шедевра вместо выбранного ранее цвета", palitra);
                         break;
                     case "ID2":
-                        startIntro("ID3", "Кисть", drawBtn);
+                        showIntro("ID3", "Стрелочкой можно отменить одно последнее действие", undo);
                         break;
                     case "ID3":
-                        startIntro("ID4", "Ластик", eraseBtn);
+                        showIntro("ID4", "Кисточкой ты будешь рисовать", drawBtn);
                         break;
                     case "ID4":
-                        startIntro("ID5", "Очистить экран", newBtn);
+                        showIntro("ID5", "Это просто ластик", eraseBtn);
                         break;
                     case "ID5":
-                        startIntro("ID6", "Сохранить рисунок", saveBtn);
+                        showIntro("ID6", "Тут можно очистить холс", newBtn);
+                        break;
+                    case "ID6":
+                        showIntro("ID7", "А здесь сохранить готовую работу", saveBtn);
                         break;
                 }
             }
         };
 
-        startIntro("ID", "Рабочая область", drawView);
+        showIntro("ID", "Вот смотри. Это твой холст. Здеь ты можешь риовать своим пальчиком", drawView);
 
     }
 
@@ -103,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    public void startIntro(String id, String text, View view) {
+    public void showIntro(String id, String text, View view) {
         new MaterialIntroView.Builder(this)
                 .setConfiguration(config)
                 .enableIcon(false)
@@ -131,15 +138,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void chooseColor() {
         ColorPickerDialog colorPickerDialog= ColorPickerDialog.createColorPickerDialog(this);
-        colorPickerDialog.setOnColorPickedListener(new ColorPickerDialog.OnColorPickedListener() {
-            @Override
-            public void onColorPicked(int color, String hexVal) {
-                drawView.setColor(color);
-                currPaint.setTag(hexVal);
-                currPaint.setBackgroundColor(color);
-            }
+        colorPickerDialog.setNegativeActionText("Закрыть");
+        colorPickerDialog.setPositiveActionText("Выбрать");
+        colorPickerDialog.setOnColorPickedListener((color, hexVal) -> {
+            drawView.setColor(color);
+            currPaint.setTag(hexVal);
+            currPaint.setBackgroundColor(color);
         });
         colorPickerDialog.show();
+    }
+
+    void selectItem(View view) {
+        //TODO
     }
 
     @Override
@@ -147,56 +157,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (view.getId()==R.id.brush_btn) {
             drawView.setErase(false);
         }
-        else if(view.getId()==R.id.erase_btn) {
-//            drawView.setErase(true);
+        else if (view.getId()==R.id.undo) {
+            drawView.removeLastPath();
+        }
+        else if (view.getId()==R.id.palitra) {
             chooseColor();
+        }
+        else if(view.getId()==R.id.erase_btn) {
+            drawView.setErase(true);
         }
         else if(view.getId()==R.id.new_btn) {
             AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
             newDialog.setTitle("Новое изображение");
-            newDialog.setMessage("Оистить экран?");
-            newDialog.setPositiveButton("Да", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    drawView.startNew();
-                    dialog.dismiss();
-                }
+            newDialog.setMessage("Очистить экран?");
+            newDialog.setPositiveButton("Да", (dialog, which) -> {
+                drawView.startNew();
+                dialog.dismiss();
             });
-            newDialog.setNegativeButton("Закрыть", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    dialog.cancel();
-                }
-            });
+            newDialog.setNegativeButton("Закрыть", (dialog, which) -> dialog.cancel());
             newDialog.show();
         }
         else if(view.getId()==R.id.save_btn) {
-            AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
-            saveDialog.setTitle("Сохранение изоражения");
-            saveDialog.setMessage("Хотите сохранить изображение в галерею?");
-            saveDialog.setPositiveButton("Да", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    drawView.setDrawingCacheEnabled(true);
-                    String imgSaved = MediaStore.Images.Media.insertImage(
-                            getContentResolver(), drawView.getDrawingCache(),
-                            UUID.randomUUID().toString()+".png", "drawing");
-                    if(imgSaved!=null){
-                        Toast savedToast = Toast.makeText(getApplicationContext(),
-                                "Изображение сохранено в галерею", Toast.LENGTH_SHORT);
-                        savedToast.show();
-                    }
-                    else{
-                        Toast unsavedToast = Toast.makeText(getApplicationContext(),
-                                "Упс. Изоюражение не сохранилось", Toast.LENGTH_SHORT);
-                        unsavedToast.show();
-                    }
-                    drawView.destroyDrawingCache();
-                }
-            });
-            saveDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    dialog.cancel();
-                }
-            });
-            saveDialog.show();
+            saveImg();
         }
+    }
+
+    public void saveImg() {
+        AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
+        saveDialog.setTitle("Сохранение изоражения");
+        saveDialog.setMessage("Хотите сохранить изображение в галереи?");
+        saveDialog.setPositiveButton("Да", (dialog, which) -> {
+            drawView.setDrawingCacheEnabled(true);
+            String imgSaved = MediaStore.Images.Media.insertImage(
+                    getContentResolver(), drawView.getDrawingCache(),
+                    UUID.randomUUID().toString()+".png", "drawing");
+            if(imgSaved!=null){
+                showMsg("Изображение сохранено в галереи");
+            }
+            else{
+                showMsg("Упс. Изображение не сохранилось");
+            }
+            drawView.destroyDrawingCache();
+        });
+        saveDialog.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        saveDialog.show();
     }
 }
