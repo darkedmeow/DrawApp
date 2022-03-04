@@ -3,12 +3,17 @@ package com.smallgroup.drawapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.azeesoft.lib.colorpicker.ColorPickerDialog;
@@ -27,12 +32,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private DrawingView drawView;
     private ImageButton currPaint;
     private ImageView drawBtn, eraseBtn, newBtn, saveBtn, palitra, undo;
+    private LinearLayout upPanel;
+    private RelativeLayout downPanel;
 
     private float smallBrush, mediumBrush, largeBrush;
+    private boolean showPanels;
 
     private MaterialIntroConfiguration config;
     private MaterialIntroListener materialIntroListener;
 
+    private GestureDetector gestureDetector;
 
 
     @Override
@@ -44,14 +53,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LinearLayout paintLayout = findViewById(R.id.paint_colors);
         currPaint = (ImageButton) paintLayout.getChildAt(0);
         currPaint.setImageDrawable(getDrawable(R.drawable.paint_pressed));
-        palitra = findViewById(R.id.palitra);
 
+        upPanel = findViewById(R.id.up_panel);
+        downPanel = findViewById(R.id.down_panel);
+        showPanels = false;
+
+        palitra = findViewById(R.id.palitra);
+        palitra.setOnClickListener(this);
         undo = findViewById(R.id.undo);
+        undo.setOnClickListener(this);
         drawBtn = findViewById(R.id.brush_btn);
         drawBtn.setOnClickListener(this);
         eraseBtn = findViewById(R.id.erase_btn);
         eraseBtn.setOnClickListener(this);
-        newBtn = findViewById(R.id.new_btn);
+        newBtn = findViewById(R.id.clear_btn);
         newBtn.setOnClickListener(this);
         saveBtn = findViewById(R.id.save_btn);
         saveBtn.setOnClickListener(this);
@@ -61,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         largeBrush = getResources().getInteger(R.integer.large_size);
 
         configurationMaterialIntro();
+        setupGestureDetector();
 
         materialIntroListener = new MaterialIntroListener() {
             @Override
@@ -94,6 +110,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         showIntro("ID", "Вот смотри. Это твой холст. Здеь ты можешь риовать своим пальчиком", drawView);
 
+    }
+
+    public void setupGestureDetector() {
+        GestureDetector.SimpleOnGestureListener listener = new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                if (showPanels)
+                    showHidePanels(View.VISIBLE);
+                else
+                    showHidePanels(View.GONE);
+                showPanels = !showPanels;
+                return super.onDoubleTap(e);
+            }
+        };
+        gestureDetector = new GestureDetector(this, listener);
+        drawView.setGestureDetector(gestureDetector);
+    }
+
+    public void showHidePanels(int visibility) {
+        upPanel.setVisibility(visibility);
+        downPanel.setVisibility(visibility);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        gestureDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
     }
 
     public void showMsg(String txt) {
@@ -140,6 +183,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ColorPickerDialog colorPickerDialog= ColorPickerDialog.createColorPickerDialog(this);
         colorPickerDialog.setNegativeActionText("Закрыть");
         colorPickerDialog.setPositiveActionText("Выбрать");
+        colorPickerDialog.setInitialColor(Color.WHITE);
+        colorPickerDialog.setLastColor(Color.WHITE);
+        colorPickerDialog.hideOpacityBar();
         colorPickerDialog.setOnColorPickedListener((color, hexVal) -> {
             drawView.setColor(color);
             currPaint.setTag(hexVal);
@@ -166,20 +212,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else if(view.getId()==R.id.erase_btn) {
             drawView.setErase(true);
         }
-        else if(view.getId()==R.id.new_btn) {
-            AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
-            newDialog.setTitle("Новое изображение");
-            newDialog.setMessage("Очистить экран?");
-            newDialog.setPositiveButton("Да", (dialog, which) -> {
-                drawView.startNew();
-                dialog.dismiss();
-            });
-            newDialog.setNegativeButton("Закрыть", (dialog, which) -> dialog.cancel());
-            newDialog.show();
+        else if(view.getId()==R.id.clear_btn) {
+            clearImg();
         }
         else if(view.getId()==R.id.save_btn) {
             saveImg();
         }
+    }
+
+    public void clearImg() {
+        AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
+        newDialog.setTitle("Новое изображение");
+        newDialog.setMessage("Очистить экран?");
+        newDialog.setPositiveButton("Да", (dialog, which) -> {
+            drawView.clearCanvas();
+            dialog.dismiss();
+        });
+        newDialog.setNegativeButton("Закрыть", (dialog, which) -> dialog.cancel());
+        newDialog.show();
     }
 
     public void saveImg() {

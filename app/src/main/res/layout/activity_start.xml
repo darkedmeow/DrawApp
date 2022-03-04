@@ -6,26 +6,55 @@
     android:layout_height="match_parent"
     tools:context=".StartActivity">
 
+
     <ImageView
-        android:id="@+id/background_iamge"
-        android:src="@drawable/background_start"
-        android:scaleType="centerCrop"
-        android:adjustViewBounds="true"
+        android:id="@+id/background_image"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/background_start" />
 
     <Button
-        android:backgroundTint="@color/white"
         android:id="@+id/start"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="70sp"
-        android:text="Start"
-        android:textSize="28sp"
-        app:layout_constraintBottom_toBottomOf="@+id/background_iamge"
-        app:layout_constraintEnd_toEndOf="@+id/background_iamge"
+        android:layout_height="120dp"
+        android:layout_marginHorizontal="80sp"
+        android:backgroundTint="@color/white"
+        android:text="Начать рисовать"
+        android:textAllCaps="false"
+        android:textSize="30sp"
+        android:elevation="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/background_image"
+        app:layout_constraintEnd_toEndOf="@+id/background_image"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/background_iamge"
+        app:layout_constraintTop_toTopOf="@+id/background_image"
         app:layout_constraintVertical_bias="0.407" />
+
+    <RelativeLayout
+        android:id="@+id/load_fon"
+        android:layout_width="wrap_content"
+        android:layout_height="800dp"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="800dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/polosa" />
+
+        <ImageView
+            android:id="@+id/valic"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:scaleType="center"
+            android:src="@drawable/valic" />
+
+
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

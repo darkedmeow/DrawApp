@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomColorPicker" parent="ColorPicker">
+        <item name="cp_showOpacityBar">false</item>
+    </style>
+</resources>

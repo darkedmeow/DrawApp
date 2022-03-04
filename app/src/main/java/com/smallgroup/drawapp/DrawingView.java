@@ -35,14 +35,18 @@ public class DrawingView extends View {
         super(context, attrs);
         paths = new ArrayList<>();
         setupDrawing();
-        setupGestureDetector();
+        //setupGestureDetector();
+    }
+
+    public void setGestureDetector(GestureDetector gestureDetector) {
+        this.gestureDetector = gestureDetector;
     }
 
     private void setupGestureDetector() {
         GestureDetector.SimpleOnGestureListener listener = new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                //TODO("отмена действия")
+                //double taping created path and it needs to be removed
                 removeLastPath();
                 removeLastPath();
                 Log.d("GESTURE", "Double tap");
@@ -69,8 +73,10 @@ public class DrawingView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        canvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        drawCanvas = new Canvas(canvasBitmap);
+        if (canvasBitmap == null) {
+            canvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            drawCanvas = new Canvas(canvasBitmap);
+        }
     }
 
     @Override
@@ -86,9 +92,10 @@ public class DrawingView extends View {
         float touchX = event.getX();
         float touchY = event.getY();
 
-        if(gestureDetector.onTouchEvent(event)) {
-            return true;
-        }
+//        if(gestureDetector.onTouchEvent(event)) {
+//            return true;
+//        }
+        gestureDetector.onTouchEvent(event);
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -130,13 +137,16 @@ public class DrawingView extends View {
     public void setErase(boolean isErase){
         erase=isErase;
         if(erase)
-            drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+//            drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            drawPaint.setColor(Color.WHITE);
         else
-            drawPaint.setXfermode(null);
+            drawPaint.setColor(paintColor);
+//            drawPaint.setXfermode(null);
     }
 
-    public void startNew(){
+    public void clearCanvas(){
         drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        paths.clear();
         invalidate();
     }
 
@@ -144,7 +154,6 @@ public class DrawingView extends View {
         if (paths.size() > 0) {
             paths.remove(paths.size() - 1);
             drawCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-            Log.d("REMOVE", "remove last path"+ paths.size());
             invalidate();
         }
     }
