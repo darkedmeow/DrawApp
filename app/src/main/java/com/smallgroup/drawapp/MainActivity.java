@@ -117,9 +117,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public boolean onDoubleTap(MotionEvent e) {
                 if (showPanels)
-                    showHidePanels(View.VISIBLE);
+                    showPanels();
                 else
-                    showHidePanels(View.GONE);
+                    hidePanels();
                 showPanels = !showPanels;
                 return super.onDoubleTap(e);
             }
@@ -128,9 +128,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         drawView.setGestureDetector(gestureDetector);
     }
 
-    public void showHidePanels(int visibility) {
-        upPanel.setVisibility(visibility);
-        downPanel.setVisibility(visibility);
+    public void hidePanels() {
+        upPanel.animate().translationY(-upPanel.getHeight()).setDuration(200);
+        downPanel.animate().translationY(downPanel.getHeight()).setDuration(200);
+    }
+
+    public void showPanels() {
+        upPanel.animate().translationY(0).setDuration(200);
+        downPanel.animate().translationY(0).setDuration(200);
     }
 
     @Override
